@@ -5,16 +5,26 @@ var React = require('react'),
 
 
 var Application = React.createClass({
+    getInitialState: function(){
+      
+        return {
+            route: new Route([
+                {name : 'Chennai' },
+                {name: 'Bangalore'}
+            ])
+        };
+    },
     componentDidMount: function () {
         
     },
     render: function () {
         var mapService = this.props.mapService;
+        route = this.state.route;
         return (
             <div>
                 <Header/>
                 <div className="route-map-container">
-                    <RoutePlan />
+                    <RoutePlan route={route} />
                     <Map service={mapService} />
                 </div>
             </div>

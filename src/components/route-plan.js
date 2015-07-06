@@ -1,9 +1,29 @@
 var React = require('react'),
+    WayPoint = require('./way-point'),
+    WayPointModel = require('../models/way-point'),
     vent = require('../util/vent');
     
     
 var RoutePlan= React.createClass({
+    getIntialState: function(){
+        
+    },
+    onAction: function(index,action,options){
+        
+    },
+    editWayPoint: function(index){
+        
+    },
+    saveWayPoint: function(index,value){
+        
+    },
     addWayPoint: function(){
+        
+    },
+    removeWayPoint: function(){
+        
+    },
+    updateRoutes: function(){
         
     },
     render: function(){
