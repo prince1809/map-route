@@ -1,7 +1,8 @@
 var React = require('react'),
     Header = require('./header'),
     RoutePlan = require('./route-plan'),
-    Map = require('./map');
+    Map = require('./map'),
+    Route = require('./../models/route');
 
 
 var Application = React.createClass({

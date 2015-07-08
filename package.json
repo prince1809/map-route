@@ -11,7 +11,8 @@
         "react-mixin-manager": "*",
         "google-maps": "*",
         "domready": "*",
-        "vent": "*"
+        "vent": "*",
+        "jquery": "*"
     },
     "devDependencies": {
         "grunt": "*",
