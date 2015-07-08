@@ -19,26 +19,44 @@ var Map = React.createClass({
             center: DEFAULT_LOCATION
         });
         vent.on('map:directions:update',this.updateDirections,this);
+        this.updateRoute(this.props.route);
     },
-    updateDirections: function(){
-        console.log('updating directions');
-        var google = this.props.service,
-                start = 'Chennai, IN',
-                end = 'Hyderabad, IN',
-                request = {
-                    origin: start,
-                    destination: end,
-                    travelMode: google.maps.TravelMode.DRIVING
-                };
-        directionsService.route(request,function(response,status){
-            console.log(status);
-            directionsDisplay.setDirections(response);
-        });
-        
+    updateDistanceData:function(response){
+        vent.trigger('map:route:distance:update',response);
+    },
+    updateRoute: function(route){
+      var google = this.props.service,
+              request = {
+                  origin: route.at(0).get('name'),
+                  destination: route.at(route.length -1 ).get('name'),
+                  travelMode: google.maps.TravelMode.DRIVING
+              },
+              wayPoints = [],
+              i,
+              noOfWayPoints = route.length -2,
+              self = this;
+      
+      if(noOfWayPoints > 0){
+          for(i = 1; i<= noOfWayPoints; i++){
+              wayPoints.push({
+                  location: route.at(i).get('name')
+              });
+          }
+          request.waypoints = wayPoints;
+      }
+      
+      directionsService.route(request,function(response,request){
+          self.updateDistanceData(response);
+          directionsDisplay.setDirections(response);
+      });
     },
     renderMap: function(mapOptions){
       var google = this.props.service,
-          map = new google.maps.Map(document.getElementById('map'),mapOptions);
+          mapCanvas = document.getElementById('map'),
+          map,
+          vH = Math.max(document.documentElement.clientHeight,window.innerHeight || 0);
+        mapCanvas.style.height= vH + 'px';
+          map = new google.maps.Map(mapCanvas,mapOptions);
         directionsDisplay.setMap(map);
     },
     render: function(){
