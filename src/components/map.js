@@ -10,7 +10,7 @@ var Map = React.createClass({
     
     componentDidMount: function(){
         
-        var google = this.props.service;
+        var google = this.props.mapService;
         directionsDisplay = new google.maps.DirectionsRenderer();
         directionsService = new google.maps.DirectionsService();
         DEFAULT_LOCATION = new google.maps.LatLng(13.0827,80.2707);
@@ -51,7 +51,7 @@ var Map = React.createClass({
       });
     },
     renderMap: function(mapOptions){
-      var google = this.props.service,
+      var google = this.props.mapService,
           mapCanvas = document.getElementById('map'),
           map,
           vH = Math.max(document.documentElement.clientHeight,window.innerHeight || 0);

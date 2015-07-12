@@ -1,30 +1,112 @@
 var React = require('react'),
+    vent = require('../util/vent'),
+    Header = require('./header'),
+    RouteTabs = require('./route-tabs'),
     RoutePlan = require('./route-plan'),
     Map = require('./map'),
-    Route = require('./../models/route');
+    Route = require('./../models/route'),
+    SeedData = require('../util/seed-data');
 
 
 var Application = React.createClass({
     getInitialState: function(){
       
         return {
-            route: new Route([
-                {name : 'San Francisco, CA' },
-                {name: 'Fremort, CA'},
-                {name: 'San Jose, CA'}
-            ])
+            routes: this.load() || SeedData.routes,
+            activeRoute: 0
         };
     },
     componentDidMount: function () {
-        
+        this.state.routes.on('remove change', this.updateRouteWayPoints);
+        vent.on('app:save', this.save, this);
+    },
+    onAction: function(action,value){
+      switch(action){
+          case 'change-name':
+              this.onRouteNameChange(value);
+              break;
+          case 'remove':
+              this.onRouteRemove();
+              break;
+          
+      }  
+    },
+    onRouteSwicth: function(routeIndex){
+      this.setState({
+          activeRoute: routeIndex
+      }, function(){
+         vent.trigger('map:route:way-points:update'); 
+      });  
+    },
+    onRouteNameChange: function(value){
+      var route = this.state.routes.at(this.state.activeRoute);
+      route.set('name',value);
+      this.save();
+      this.setState({
+          routeUpdated: new Date().getTime()
+      });
+    },
+    onRouteAdd: function(){
+      var routes = this.state.routes;
+      routes.add(SeedData.newRoute());
+      this.save();
+      this.setState({
+          activeRoute: routes.length - 1
+      });
+    },
+    onRouteRemove: function(){
+        var routes = this.state.routes;
+        routes.remove(routes.at(this.state.activeRoute),{silent: true });
+        this.save();
+        if(routes.length === 0){
+            this.onRouteAdd();
+        }else {
+            if(this.state.activeRoute > 0){
+                this.setState({
+                    activeRoute: this.state.activeRoute - 1
+                });
+            }else {
+                this.setState({
+                    activeRoute:0
+                });
+            }
+        }
+    },
+    updateRouteWayPoints: function(){
+        vent.trigger('map:route:way-points:update');
+    },
+    load: function(){
+        var saved = localStorage.getItem('routes'),
+                routes = null;
+        if (!!saved) {
+            saved = JSON.parse(saved);
+            routes = new Routes();
+            saved.map(function (route) {
+                var route = new Route({
+                    name: route.name,
+                    wayPoints: new WayPoints(route.wayPoints)
+                });
+                routes.add(route, {silent: true});
+            });
+        }
+        return routes;
     },
     render: function () {
         var mapService = this.props.mapService;
-        route = this.state.route;
+        route = this.state.routes.at(this.state.activeRoute);
         return (
             <div>
-                <Map service={mapService} route={route} />
-                <RoutePlan route={route} />
+                <Header/>
+                <Map mapService={mapService} route={route} />
+                <div className='route-planner'>
+                    <RouteTabs
+                    onAdd={this.onRouteAdd}
+                    onSwitch={this.onRouteSwitch}
+                    routes={this.state.routes}
+                    active={this.state.activeRoute}
+                    />
+                <RoutePlan mapService={mapService} route={route} routeAction={this.onAction} />
+                </div>
             </div>
             );
     }

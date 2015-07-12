@@ -9,4 +9,3 @@ var WayPoint = Backbone.Model.extend({
 });
 
 module.exports = WayPoint;
-

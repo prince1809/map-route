@@ -19,7 +19,7 @@ var ViewWayPoint = React.createClass({
     edit: function(){
         this.props.onAction('edit');
     },
-    add: function(){
+    add: function(e){
         e.preventDefault();
         this.props.onAction('add');
     },

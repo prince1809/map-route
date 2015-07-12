@@ -1,4 +1,6 @@
 var React = require('react'),
+    RouteName = require('./route-name'),
+    Dashboard = require('./dashboard'),
     WayPoint = require('./way-point'),
     RouteInfo = require('./route-info'),
     WayPointModel = require('../models/way-point'),
@@ -12,6 +14,16 @@ var RoutePlan = React.createClass({
     },
     componentDidMount: function () {
         vent.on('map:route:distance:update', this.updateRouteDistance, this);
+        this.props.route.get('wayPoints').on('remove change', this.updateWayPoints);
+    },
+    componentWillReceiveProps: function(nextProps){
+      if(this.props.route !== nextProps.route){
+          this.props.route.get('wayPoints').off('remove change');
+          nextProps.route.get('wayPoints').on('remove change', this.updateWayPoints);
+      }  
+    },
+    componentWillUnmount: function(){
+      vent.off('map:route:distance:update');  
     },
     updateRouteDistance: function (response) {
         var mapRoutes = response.routes,
@@ -31,49 +43,49 @@ var RoutePlan = React.createClass({
             });
         }
     },
-    onAction: function (index, action, options) {
-        switch (action) {
+    onWayPointAction: function(index, action, options){
+        switch(action){
             case 'edit':
                 this.editWayPoint(index);
                 break;
             case 'save':
-                this.saveWayPoint(index, options.value);
-                break;
-            case 'remove':
-                this.removeWayPoint(index);
+                this.saveWayPoint(index,options.value);
                 break;
             case 'add':
                 this.addWayPoint(index);
                 break;
-            case 'cancel':
-                this.cancel(index);
+            
         }
     },
-    editWayPoint: function (index) {
+    
+    editWayPoint: function(index){
         this.setState({
             editingAt: index
         });
     },
-    saveWayPoint: function (index, value) {
-        var route = this.props.route;
-        route.at(index).set({
-            name: value
-        });
-        this.setState({
-            editingAt: -1
-        });
+    saveWayPoint: function(index, value){
+      var wayPoints = this.props.route.get('wayPoints');
+      wayPoints.at(index).set({
+          name: value
+      });
+      vent.trigger('app:save');
+      this.setState({
+          editingAt: -1
+      });
     },
     addWayPoint: function (index) {
-        var route = this.props.route;
-        route.add(new WayPointModel(), {at: index + 1});
+        var wayPoints = this.props.route.get('wayPoints');
+        wayPoints.add(new  WayPointModel(),{ at: index +1} );
+        vent.trigger('app:save');
         this.setState({
             editingAt: index + 1
         });
     },
     removeWayPoint: function (index) {
-        var route = this.props.route;
-        if (route.length > 2) {
-            route.remove(route.at(index));
+        var wayPoints = this.props.route.get('wayPoints');
+        if (wayPoints.length > 2) {
+            wayPoints.remove(wayPoints.at(index));
+            vent.trigger('app:save');
             this.setState({
                 editingAt: -1
             });
@@ -81,35 +93,36 @@ var RoutePlan = React.createClass({
             alert('Sorry. You need at least two destinations in here.');
         }
     },
-    updateRoutes: function () {
-        vent.trigger('map:route:update', this.props.route);
+    updateWayPoints: function () {
+        vent.trigger('map:route:way-points:update');
     },
     render: function () {
         var route = this.props.route,
+            wayPoints =  route.get('wayPoints'),
             self = this,
-            wayPoints = route.map(function (wayPoint, index) {
+            wayPointsElm = wayPoints.map(function (wayPoint, index) {
                 var key = 'wayPoint' + index,
                     routeInfo = index === 0 ? null : <RouteInfo wayPoint={wayPoint}/>;
 
                 return (
-                    <div>
+                    <div key={key}>
                     {routeInfo}
                         <WayPoint
-                        ref={key}
-                        key={key}
+                        mapService={self.props.mapService}
                         wayPoint={wayPoint}
                         editing={self.state.editingAt === index}
-                        onAction={self.onAction.bind(self, index)}
+                        onAction={self.onWayPointAction.bind(self, index)}
                         />
                     </div>
                     );
             });
         return (
             <div className='route-plan'>
-                <div ref='wayPoints'>
-                    {wayPoints}
+                <RouteName route={route} onAction={this.props.routeAction} />
+                
+                <div ref='wayPoints' className='way-points'>
+                    {wayPointsElm}
                 </div>
-                <button onClick={this.updateRoutes}>Update</button>
             </div>
             );
     }
