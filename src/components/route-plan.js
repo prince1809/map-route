@@ -27,7 +27,7 @@ var RoutePlan = React.createClass({
     },
     updateRouteDistance: function (response) {
         var mapRoutes = response.routes,
-            route = this.props.route,
+            wayPoints = this.props.route.get('wayPoints'),
             routeLegs,
             i;
         if (mapRoutes && mapRoutes.length > 0) {
@@ -50,6 +50,9 @@ var RoutePlan = React.createClass({
                 break;
             case 'save':
                 this.saveWayPoint(index,options.value);
+                break;
+            case 'remove':
+                this.removeWayPoint(index);
                 break;
             case 'add':
                 this.addWayPoint(index);
@@ -119,7 +122,7 @@ var RoutePlan = React.createClass({
         return (
             <div className='route-plan'>
                 <RouteName route={route} onAction={this.props.routeAction} />
-                
+                <Dashboard route={route} />
                 <div ref='wayPoints' className='way-points'>
                     {wayPointsElm}
                 </div>

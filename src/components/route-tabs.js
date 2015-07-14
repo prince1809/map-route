@@ -19,7 +19,7 @@ var React = require('react');
              tabsElm = routes.map(function(route,i){
                  var active = (i === self.props.active) ? 'active' : '';
                  return (
-                    <li className={active} onClick={self.switchRoute.bind(self,i)} key={'route'+i}>
+                    <li title='Switch to this route' className={active} onClick={self.switchRoute.bind(self,i)} key={'route'+i}>
                     {i + 1}
                     </li>
                     );
@@ -28,7 +28,7 @@ var React = require('react');
              return (
                  <ol className='route-tabs'>
                  {tabsElm}
-                    <li onCLick={this.addRoute} key='add-route'>
+                    <li title='Add a new route' onCLick={this.addRoute} key='add-route'>
                         <i className='icon-add'></i>
                     </li>
                  </ol>
