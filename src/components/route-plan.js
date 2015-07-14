@@ -33,7 +33,7 @@ var RoutePlan = React.createClass({
         if (mapRoutes && mapRoutes.length > 0) {
             routeLegs = mapRoutes[0].legs;
             for (i = 0; i < routeLegs.length; i++) {
-                route.at(i + 1).set({
+                wayPoints.at(i + 1).set({
                     distance: routeLegs[i].distance,
                     duration: routeLegs[i].duration
                 });

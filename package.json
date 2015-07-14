@@ -11,6 +11,8 @@
         "react-mixin-manager": "*",
         "google-maps": "*",
         "domready": "*",
+        "promise": "*",
+        "classnames": "*",
         "vent": "*",
         "jquery": "*"
     },
@@ -19,6 +21,8 @@
         "browserify": "*",
         "grunt-browserify": "*",
         "grunt-cli": "*",
+        "grunt-contrib-sass": "*",
+        "grunt-contrib-cssmin": "*",
         "grunt-contrib-watch": "*",
         "grunt-contrib-connect": "*",
         "reactify": "*"
