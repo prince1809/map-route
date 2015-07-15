@@ -18,7 +18,7 @@ var Map = React.createClass({
             zoom: 7,
             center: DEFAULT_LOCATION
         });
-        vent.on('map:routeway-points:update',this.updateWayPoints,this);
+        vent.on('map:route:way-points:update',this.updateWayPoints,this);
         //this.adsense();
         this.updateWayPoints();
     },
